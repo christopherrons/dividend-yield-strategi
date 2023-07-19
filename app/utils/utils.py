@@ -1,9 +1,22 @@
 from datetime import datetime, date
 
+import bs4 as bs
+import requests
 from dateutil.relativedelta import relativedelta
 
 
 class Utils:
+    @staticmethod
+    def get_sp_tickers():
+        resp = requests.get('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+        soup = bs.BeautifulSoup(resp.text, 'lxml')
+        table = soup.find('table', {'class': 'wikitable sortable'})
+        tickers = []
+        for row in table.findAll('tr')[1:]:
+            ticker = row.findAll('td')[0].text
+            tickers.append(ticker)
+
+        return [s.replace('\n', '') for s in tickers]
 
     @staticmethod
     def get_date_yesterday() -> date:
