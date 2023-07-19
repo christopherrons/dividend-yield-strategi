@@ -19,7 +19,7 @@ def main():
     result: TickerData = blue_chip_filter.run_filter(ticker_data)
     print("Suggested Symbols:")
     for symbol, ticker_data_item in result.symbol_to_ticker_response.items():
-        print(f"{symbol}")
+        print(f"{symbol} - {ticker_data_item.get_basic_info()}")
 
 
 def get_sp_tickers():
