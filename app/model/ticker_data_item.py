@@ -23,4 +23,6 @@ class TickerDataItem:
         return int(major_holders[major_holders[1] == "Number of Institutions Holding Shares"][0].values[0])
 
     def get_basic_info(self):
-        return f"Name: {self.ticker.info['longName']} - DY: {self.ticker.info['dividendYield']} - PEG: {self.ticker.info['pegRatio']} - PB: {self.ticker.info['priceToBook']} - Sector: {self.ticker.info['sector']} - Industry: {self.ticker.info['industry']} - Website: {self.ticker.info['website']}"
+        return f"Name: {self.ticker.info.get('longName')} - DY: {self.ticker.info.get('dividendYield')} - PEG: {self.ticker.info.get('pegRatio')} \
+        - PB: {self.ticker.info.get('priceToBook')} - Sector: {self.ticker.info.get('sector')} - Industry: {self.ticker.info.get('industry')} \
+        - Website: {self.ticker.info.get('website')}"
