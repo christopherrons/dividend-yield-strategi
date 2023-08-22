@@ -1,22 +1,24 @@
-from pandas import DataFrame, Series
+from pandas import DataFrame, DatetimeIndex, Series
 from yfinance import Ticker
 
 
 class TickerDataItem:
 
-    def __init__(self, symbol: str, ticker: Ticker):
+    def __init__(self, symbol: str, start_date: str, end_date: str, ticker: Ticker):
         self.symbol = symbol
+        self.start_date = start_date
+        self.end_date = end_date
         self.ticker = ticker
         self.historical_data = None  # This can be added if required: yf.download(symbol)
 
-    def get_dividend_dates(self) -> DataFrame:
+    def get_dividend_dates(self) -> DatetimeIndex:
         return self.ticker.dividends.index
 
-    def get_dividend(self) -> Series:
+    def get_dividends(self) -> Series:
         return self.ticker.dividends
 
     def get_nr_of_shares(self) -> int:
-        return self.ticker.info["sharesOutstanding"]
+        return self.ticker.info['sharesOutstanding']
 
     def get_nr_of_institutional_holders(self) -> int:
         major_holders: DataFrame = self.ticker.major_holders
