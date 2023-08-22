@@ -20,5 +20,5 @@ class YahooFinanceApiClient:
                 start_date if start_date else Utils.get_date_string_first_trade(ticker.info['firstTradeDateEpochUtc']),
                 end_date if end_date else Utils.get_date_string_yesterday(),
                 ticker,
-            )) for symbol, ticker in tickers.tickers.items()),
+            )) for symbol, ticker in tickers.tickers.items() if 'firstTradeDateEpochUtc' in ticker.info.keys()),
         )
