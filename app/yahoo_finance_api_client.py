@@ -11,7 +11,7 @@ class YahooFinanceApiClient:
     @staticmethod
     def ticker_requests(indices: list, start_date: str = None, end_date: str = None) -> TickerData:
         logger.info(f"Gathering historical data for the following markets: {', '.join(indices)}")
-        symbols = sum([Utils.get_tickers(index)[:10] for index in indices], [])
+        symbols = sum([Utils.get_tickers(index) for index in indices], [])
         tickers: Tickers = yf.Tickers(list(dict.fromkeys(symbols))) # Duplicates are removed!
         return TickerData(
             indices,
