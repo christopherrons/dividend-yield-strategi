@@ -92,7 +92,8 @@ class BlueChipFilter:
             Utils.get_date_string_n_years_back(12, ticker_item.end_date):ticker_item.end_date
         ]
         dividend_increases = dividends_filtered.diff()[dividends_filtered.diff() > 0].dropna()
-        if dividend_increases.size < self.min_nr_of_dividend_increases:
+        dividend_decreases = dividends_filtered.diff()[dividends_filtered.diff() < 0].dropna()
+        if any([dividend_increases.size < self.min_nr_of_dividend_increases, dividend_decreases.size > 0]):
             logger.info(f"Filter symbol {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
             return False
         return True
