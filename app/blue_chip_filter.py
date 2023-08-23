@@ -62,7 +62,11 @@ class BlueChipFilter:
 
     def has_minimum_nr_of_institutional_investors(self, ticker_item: TickerDataItem) -> bool:
         nr_of_institutional_investors: int = ticker_item.get_nr_of_institutional_holders()
-        if nr_of_institutional_investors < self.min_nr_of_institutional_investors:
+        float_held_by_institutional_investors: float = ticker_item.get_float_held_by_institutional_investors()
+        if any([
+            nr_of_institutional_investors < self.min_nr_of_institutional_investors,
+            float_held_by_institutional_investors < 0.5,
+        ]):
             logger.info(f"Filter symbol {ticker_item.symbol} - Number of institutional investors to low: {nr_of_institutional_investors}.")
             return False
         return True
