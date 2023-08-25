@@ -1,28 +1,20 @@
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import bs4 as bs
+from pandas import DataFrame
+import csv
 import requests
 
 class Utils:
     @staticmethod
-    def get_tickers(index: str):
-        if index == 'S&P500':
-            resp = requests.get('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-            idx_table = 0
-            idx_column = 0
-        if index == 'Nasdaq-100':
-            resp = requests.get('https://en.wikipedia.org/wiki/Nasdaq-100')
-            idx_table = 2
-            idx_column = 1
-
-        soup = bs.BeautifulSoup(resp.text, 'lxml')
-        table = soup.findAll('table', {'class': 'wikitable sortable'})[idx_table]
-        tickers = []
-        for row in table.findAll('tr')[1:]:
-            ticker = row.findAll('td')[idx_column].text
-            tickers.append(ticker)
-
-        return [s.replace('\n', '') for s in tickers]
+    def get_tickers(exchanges: str):
+        api_key = 'JSEKU0PHS270VWS0' # Free API key from https://www.alphavantage.co/support/#api-key!
+        url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={api_key}'
+        with requests.Session() as s:
+            download = s.get(url)
+            decoded_content = download.content.decode('utf-8')
+            cr = list(csv.reader(decoded_content.splitlines(), delimiter=','))
+            all_tickers = DataFrame(cr[1:], columns=cr[0])
+            return all_tickers[(all_tickers['exchange'] == exchanges) & (all_tickers['assetType'] == 'Stock')]
 
     @staticmethod
     def get_date_yesterday() -> date:

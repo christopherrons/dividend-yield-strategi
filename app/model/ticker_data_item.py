@@ -9,7 +9,7 @@ class TickerDataItem:
         self.start_date = start_date
         self.end_date = end_date
         self.ticker = ticker
-        self.historical_data = None  # This can be added if required: yf.download(symbol)
+        self.historical_data = None
 
     def get_dividend_dates(self) -> DatetimeIndex:
         return self.ticker.dividends.index

@@ -5,16 +5,16 @@ from app.yahoo_finance_api_client import YahooFinanceApiClient
 
 def main():
     ticker_data: TickerData = YahooFinanceApiClient.ticker_requests(
-        indices=['S&P500', 'Nasdaq-100'],
+        exchanges=['NYSE', 'NASDAQ'],
         start_date=None,
         end_date=None,
     )
 
     blue_chip_filter: BlueChipFilter = BlueChipFilter()
-    result: TickerData = blue_chip_filter.run_filter(ticker_data)
+    blue_chips: TickerData = blue_chip_filter.run_filter(ticker_data)
 
     print("Suggested Symbols:")
-    for symbol, ticker_data_item in result.symbol_to_ticker_response.items():
+    for symbol, ticker_data_item in blue_chips.symbol_to_ticker_response.items():
         print(f"{symbol} - {ticker_data_item.get_basic_info()}")
 
 

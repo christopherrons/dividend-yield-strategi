@@ -15,23 +15,26 @@ class BlueChipFilter:
         min_nr_of_institutional_investors: int = 80,
         min_nr_of_uninterrupted_dividends: int = 25,
         min_nr_of_dividend_increases: int = 5,
+        min_nr_of_earning_increases: int = 7,
     ):
         self.sp_quality_ranking = sp_quality_ranking
         self.min_nr_of_shares = min_nr_of_shares
         self.min_nr_of_institutional_investors = min_nr_of_institutional_investors
         self.min_nr_of_uninterrupted_dividends = min_nr_of_uninterrupted_dividends
         self.min_nr_of_dividend_increases = min_nr_of_dividend_increases
+        self.min_nr_of_earning_increases = min_nr_of_earning_increases
 
     def run_filter(self, ticker_data: TickerData) -> TickerData:
         accepted_tickers: Dict[str, TickerDataItem] = dict()
         for symbol, ticker_data_item in ticker_data.symbol_to_ticker_response.items():
             try:
                 if self.is_applicable_symbol(ticker_data_item):
+                    # TODO: Download ticker data (create download method that executes yf.download(symbol))!
                     accepted_tickers[symbol] = ticker_data_item
             except:
                 logger.warning(f"Could not evaluate symbol: {symbol}")
 
-        return TickerData(ticker_data.indices, accepted_tickers)
+        return TickerData(ticker_data.exchanges, accepted_tickers)
 
     def is_applicable_symbol(self, ticker_item: TickerDataItem) -> bool:
         return self.is_dividend_stock(ticker_item) and \
@@ -67,7 +70,7 @@ class BlueChipFilter:
             nr_of_institutional_investors < self.min_nr_of_institutional_investors,
             float_held_by_institutional_investors < 0.5,
         ]):
-            logger.info(f"Filter symbol {ticker_item.symbol} - Number of institutional investors to low: {nr_of_institutional_investors}.")
+            logger.info(f"Filter symbol {ticker_item.symbol} - Number of or float held by institutional investors to low: {nr_of_institutional_investors}.")
             return False
         return True
 
