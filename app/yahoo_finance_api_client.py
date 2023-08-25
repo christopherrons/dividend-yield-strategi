@@ -14,7 +14,7 @@ class YahooFinanceApiClient:
     def ticker_requests(exchanges: list, start_date: str = None, end_date: str = None) -> TickerData:
         logger.info(f"Gathering historical data for the following exchanges: {', '.join(exchanges)}")
         symbols: DataFrame = pd.concat([Utils.get_tickers(index) for index in exchanges]).reset_index(drop=True)
-        tickers: Tickers = yf.Tickers(list(symbols['symbol'])[:100])
+        tickers: Tickers = yf.Tickers(list(symbols['symbol']))
         return TickerData(
             exchanges,
             dict((symbol, TickerDataItem(
@@ -22,5 +22,5 @@ class YahooFinanceApiClient:
                 start_date if start_date else list(symbols.loc[symbols['symbol'] == symbol, 'ipoDate'])[0],
                 end_date if end_date else Utils.get_date_string_yesterday(),
                 ticker,
-            )) for symbol, ticker in tickers.tickers.items() if ticker.isin != '-'),
+            )) for symbol, ticker in tickers.tickers.items()),
         )

@@ -28,8 +28,8 @@ class BlueChipFilter:
         accepted_tickers: Dict[str, TickerDataItem] = dict()
         for symbol, ticker_data_item in ticker_data.symbol_to_ticker_response.items():
             try:
+                assert ticker_data_item.ticker.isin # Filter to exclude corrupt tickers.
                 if self.is_applicable_symbol(ticker_data_item):
-                    # TODO: Download ticker data (create download method that executes yf.download(symbol))!
                     accepted_tickers[symbol] = ticker_data_item
             except:
                 logger.warning(f"Could not evaluate symbol: {symbol}")

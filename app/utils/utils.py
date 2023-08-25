@@ -7,7 +7,7 @@ import requests
 class Utils:
     @staticmethod
     def get_tickers(exchanges: str):
-        api_key = 'JSEKU0PHS270VWS0' # Free API key from https://www.alphavantage.co/support/#api-key!
+        api_key = 'JSEKU0PHS270VWS0' # Free API key from https://www.alphavantage.co/support/#api-key (5 request per minute, 100 per day).
         url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={api_key}'
         with requests.Session() as s:
             download = s.get(url)
