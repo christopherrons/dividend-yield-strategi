@@ -9,7 +9,8 @@ import pandas as pd
 
 class BlueChipFilter:
 
-    def __init__(self,
+    def __init__(
+        self,
         sp_quality_ranking: str = 'A',
         min_nr_of_shares: int = 5000000,
         min_nr_of_institutional_investors: int = 80,

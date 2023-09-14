@@ -11,9 +11,12 @@ import yfinance as yf
 class YahooFinanceApiClient:
 
     @staticmethod
-    def ticker_requests(exchanges: list, start_date: str = None, end_date: str = None) -> TickerData:
+    def ticker_requests(exchanges: list, symbols: str = None, start_date: str = None, end_date: str = None) -> TickerData:
         logger.info(f"Gathering historical data for the following exchanges: {', '.join(exchanges)}")
-        symbols: DataFrame = pd.concat([Utils.get_tickers(index) for index in exchanges]).reset_index(drop=True)
+        if not symbols:
+            symbols: DataFrame = pd.concat([Utils.get_tickers(exchange) for exchange in exchanges]).reset_index(drop=True)
+        else:
+            symbols: DataFrame = pd.read_csv(symbols, na_values=['null'], keep_default_na=False)
         tickers: Tickers = yf.Tickers(list(symbols['symbol']))
         return TickerData(
             exchanges,

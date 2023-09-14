@@ -6,7 +6,7 @@ import requests
 
 class Utils:
     @staticmethod
-    def get_tickers(exchanges: str):
+    def get_tickers(exchange: str):
         api_key = 'JSEKU0PHS270VWS0' # Free API key from https://www.alphavantage.co/support/#api-key (5 request per minute, 100 per day).
         url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={api_key}'
         with requests.Session() as s:
@@ -14,7 +14,7 @@ class Utils:
             decoded_content = download.content.decode('utf-8')
             cr = list(csv.reader(decoded_content.splitlines(), delimiter=','))
             all_tickers = DataFrame(cr[1:], columns=cr[0])
-            return all_tickers[(all_tickers['exchange'] == exchanges) & (all_tickers['assetType'] == 'Stock')]
+            return all_tickers[(all_tickers['exchange'] == exchange) & (all_tickers['assetType'] == 'Stock')]
 
     @staticmethod
     def get_date_yesterday() -> date:

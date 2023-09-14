@@ -6,6 +6,7 @@ from app.yahoo_finance_api_client import YahooFinanceApiClient
 def main():
     ticker_data: TickerData = YahooFinanceApiClient.ticker_requests(
         exchanges=['NYSE', 'NASDAQ'],
+        symbols='C:/Projects/pet-projects/dividend-yield-strategy/symbols_nyse_nasdaq.csv', # CSV file in which the symbol values are stored in a column named 'symbol'.
         start_date=None,
         end_date=None,
     )
