@@ -29,13 +29,14 @@ class BlueChipFilter:
         accepted_tickers: Dict[str, TickerDataItem] = dict()
         for symbol, ticker_data_item in ticker_data.symbol_to_ticker_response.items():
             try:
-                assert ticker_data_item.ticker.isin # Filter to exclude corrupt tickers.
+                # Filter to exclude corrupt or incomplete tickers.
+                assert ticker_data_item.ticker.info
                 if self.is_applicable_symbol(ticker_data_item):
                     accepted_tickers[symbol] = ticker_data_item
             except:
                 logger.warning(f"Could not evaluate symbol: {symbol}")
 
-        return TickerData(ticker_data.exchanges, accepted_tickers)
+        return TickerData(accepted_tickers)
 
     def is_applicable_symbol(self, ticker_item: TickerDataItem) -> bool:
         return self.is_dividend_stock(ticker_item) and \

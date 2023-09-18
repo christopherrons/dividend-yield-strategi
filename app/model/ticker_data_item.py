@@ -4,8 +4,10 @@ from yfinance import Ticker
 
 class TickerDataItem:
 
-    def __init__(self, symbol: str, start_date: str, end_date: str, ticker: Ticker):
+    def __init__(self, symbol: str, name: str, exchange: str, start_date: str, end_date: str, ticker: Ticker):
         self.symbol = symbol
+        self.name = name
+        self.exchange = exchange
         self.start_date = start_date
         self.end_date = end_date
         self.ticker = ticker
