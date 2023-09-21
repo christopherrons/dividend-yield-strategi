@@ -1,3 +1,4 @@
+from __future__ import annotations
 from app.model.ticker_data import TickerData
 from app.model.ticker_data_item import TickerDataItem
 from app.utils.utils import Utils

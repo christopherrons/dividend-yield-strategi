@@ -30,7 +30,7 @@ class TickerDataItem:
         major_holders: DataFrame = self.ticker.major_holders
         return 0.01*float((major_holders[major_holders[1] == "% of Float Held by Institutions"][0].values[0]).strip('%'))
 
-    def get_basic_info(self):
+    def get_basic_info(self) -> str:
         return f"Name: {self.ticker.info.get('longName')} - DY: {self.ticker.info.get('dividendYield')} - PEG: {self.ticker.info.get('pegRatio')} \
         - PB: {self.ticker.info.get('priceToBook')} - Sector: {self.ticker.info.get('sector')} - Industry: {self.ticker.info.get('industry')} \
         - Website: {self.ticker.info.get('website')}"

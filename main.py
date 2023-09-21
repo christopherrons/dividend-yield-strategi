@@ -1,21 +1,30 @@
 from app.blue_chip_filter import BlueChipFilter
 from app.model.ticker_data import TickerData
+from app.utils.utils import Utils
 from app.yahoo_finance_api_client import YahooFinanceApiClient
 from pathlib import Path
 
 
 def main():
     root = Path(__file__).resolve().parent
-    ticker_data: TickerData = YahooFinanceApiClient.ticker_requests(
-        symbols=root.joinpath('symbols_nyse_nasdaq.csv'), # Path to CSV file containing columns 'symbol' and 'ipoDate'.
-        # exchanges=['NYSE', 'NASDAQ'],
-        start_date=None,
-        end_date=None,
-    )
 
-    blue_chip_filter: BlueChipFilter = BlueChipFilter()
-    blue_chips: TickerData = blue_chip_filter.run_filter(ticker_data)
-    blue_chips.store_ticker_symbols(root)
+    # Get Blue Chips ticker data.
+    if not root.joinpath(f'symbols_blue_chips_{Utils.get_date_today()}.csv').exists():
+        ticker_data: TickerData = YahooFinanceApiClient.ticker_requests(
+            symbols=root.joinpath('symbols_nyse_nasdaq.csv'), # Path to CSV file containing columns 'symbol' and 'ipoDate'.
+            # exchanges=['NYSE', 'NASDAQ'], # Download ticker symbols of all currently listed companies at the specified exchange(s).
+            start_date=None,
+            end_date=None,
+        )
+        blue_chip_filter: BlueChipFilter = BlueChipFilter()
+        blue_chips: TickerData = blue_chip_filter.run_filter(ticker_data)
+        blue_chips.store_ticker_symbols(root.joinpath(f'symbols_blue_chips_{Utils.get_date_today()}.csv'))
+        blue_chips.download_price_data()
+    else:
+        blue_chips: TickerData = YahooFinanceApiClient.ticker_requests(
+            symbols=root.joinpath(f'symbols_blue_chips_{Utils.get_date_today()}.csv'),
+        )
+        blue_chips.download_price_data()
 
 
 if __name__ == '__main__':

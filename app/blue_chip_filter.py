@@ -55,7 +55,7 @@ class BlueChipFilter:
         return True
 
     def has_sp_quality_ranking(self, ticker_item: TickerDataItem) -> bool:
-        # FIXME
+        # FIXME!
         return True
 
     def has_minimum_nr_of_outstanding_shares(self, ticker_item: TickerDataItem) -> bool:
@@ -104,5 +104,5 @@ class BlueChipFilter:
         return True
 
     def is_earnings_increasing_n_times(self, ticker_item: TickerDataItem) -> bool:
-        # FIXME
+        # FIXME!
         return True
