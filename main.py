@@ -1,6 +1,7 @@
 from app.blue_chip_filter import BlueChipFilter
 from app.model.ticker_data import TickerData
 from app.utils.utils import Utils
+from app.value_profile import ValueProfile
 from app.yahoo_finance_api_client import YahooFinanceApiClient
 from pathlib import Path
 
@@ -25,6 +26,8 @@ def main():
             symbols=root.joinpath(f'symbols_blue_chips_{Utils.get_date_today()}.csv'),
         )
         blue_chips.download_price_data()
+
+    # Generate Value Profiles.
 
 
 if __name__ == '__main__':

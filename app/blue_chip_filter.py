@@ -30,7 +30,7 @@ class BlueChipFilter:
         for symbol, ticker_data_item in ticker_data.symbol_to_ticker_response.items():
             try:
                 # Filter to exclude corrupt or incomplete tickers.
-                assert ticker_data_item.ticker.info
+                assert ticker_data_item.ticker.info['regularMarketOpen']
                 if self.is_applicable_symbol(ticker_data_item):
                     accepted_tickers[symbol] = ticker_data_item
             except:
@@ -48,9 +48,8 @@ class BlueChipFilter:
             self.is_earnings_increasing_n_times(ticker_item)
 
     def is_dividend_stock(self, ticker_item: TickerDataItem) -> bool:
-        dividends: Series = ticker_item.get_dividends()
-        if len(dividends) < 1 or dividends.empty:
-            logger.info(f"Filter symbol {ticker_item.symbol} - No dividends available.")
+        if not len(ticker_item.ticker.dividends) > 0:
+            logger.info(f"Filter symbol: {ticker_item.symbol} - No dividends available.")
             return False
         return True
 
@@ -61,7 +60,7 @@ class BlueChipFilter:
     def has_minimum_nr_of_outstanding_shares(self, ticker_item: TickerDataItem) -> bool:
         nr_of_shares: int = ticker_item.get_nr_of_shares()
         if nr_of_shares < self.min_nr_of_shares:
-            logger.info(f"Filter symbol {ticker_item.symbol} - Number of shares to low: {nr_of_shares}.")
+            logger.info(f"Filter symbol: {ticker_item.symbol} - Number of shares to low: {nr_of_shares}.")
             return False
         return True
 
@@ -72,7 +71,7 @@ class BlueChipFilter:
             nr_of_institutional_investors < self.min_nr_of_institutional_investors,
             float_held_by_institutional_investors < 0.5,
         ]):
-            logger.info(f"Filter symbol {ticker_item.symbol} - Number of or float held by institutional investors to low: {nr_of_institutional_investors}.")
+            logger.info(f"Filter symbol: {ticker_item.symbol} - Number of or float held by institutional investors to low: {nr_of_institutional_investors}.")
             return False
         return True
 
@@ -84,10 +83,10 @@ class BlueChipFilter:
             freq='Q',
             tz=ticker_item.ticker.history_metadata['exchangeTimezoneName'],
         ).tz_convert(None).to_period('Q').drop_duplicates() # Only verify elapsed quarters!
-        quarters = quarters[quarters.year != 2019] # Exclude 2019 due to Covid pandemic!
+        quarters = quarters[quarters.year != 2020] # Exclude 2020 due to Covid pandemic!
         missing_quarters = quarters.difference(dividend_dates.tz_convert(None).to_period('Q'))
         if not missing_quarters.empty:
-            logger.info(f"Filter symbol {ticker_item.symbol} - Missing dividend quarters: {', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
+            logger.info(f"Filter symbol: {ticker_item.symbol} - Missing dividend quarters: {', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
             return False
         return True
 
@@ -99,7 +98,7 @@ class BlueChipFilter:
         dividend_increases = dividends_filtered.diff()[dividends_filtered.diff() > 0].dropna()
         dividend_decreases = dividends_filtered.diff()[dividends_filtered.diff() < 0].dropna()
         if any([dividend_increases.size < self.min_nr_of_dividend_increases, dividend_decreases.size > 0]):
-            logger.info(f"Filter symbol {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
+            logger.info(f"Filter symbol: {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
             return False
         return True
 

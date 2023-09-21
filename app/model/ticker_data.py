@@ -29,4 +29,5 @@ class TickerData:
             ],
             columns=['symbol', 'name', 'exchange', 'ipoDate'],
         )
-        df_tickers.to_csv(dst, index=False)
+        if not df_tickers.empty:
+            df_tickers.to_csv(dst, index=False)
