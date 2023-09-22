@@ -13,9 +13,17 @@ class TickerData:
     def __init__(self, symbol_to_ticker_response: Dict[str, TickerDataItem]):
         self.symbol_to_ticker_response = symbol_to_ticker_response
 
-    def download_price_data(self) -> TickerData:
-        # yf.download() FIXME!
-        return
+    def download_price_data(self) -> None:
+        for symbol, ticker_data_item in self.symbol_to_ticker_response.items():
+            logger.info(f"Downloading historical data for symbol: {symbol}")
+            ticker_data_item.historical_data = yf.download(
+                symbol,
+                start=ticker_data_item.start_date,
+                end=ticker_data_item.end_date,
+                actions=True,
+                auto_adjust=True,
+                progress=False,
+            )
 
     def store_ticker_symbols(self, dst: Path) -> None:
         logger.info("Store Blue Chip ticker symbols.")
