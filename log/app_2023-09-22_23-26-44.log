@@ -1,2 +1,0 @@
-2023-09-22 23:26:44.469 | INFO     | app.utils.utils:get_tickers:29 - Gathering ticker symbols for exchange: NYSE
-2023-09-22 23:26:45.466 | INFO     | app.utils.utils:get_tickers:29 - Gathering ticker symbols for exchange: NASDAQ

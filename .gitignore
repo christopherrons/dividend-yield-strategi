@@ -1,3 +1,4 @@
 # ignore (virtual) environment folders/files
 .idea/
 venv
+log
