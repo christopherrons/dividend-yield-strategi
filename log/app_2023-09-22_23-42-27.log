@@ -1,0 +1,1 @@
+2023-09-22 23:42:27.081 | INFO     | app.utils.utils:load_symbols_from_csv:20 - Reading ticker symbols from the file: /home/christopher/dev/dividend-yield-strategi/result/symbols_blue_chips_2023-09-22.csv.

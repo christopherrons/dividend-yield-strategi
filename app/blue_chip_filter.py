@@ -1,22 +1,24 @@
+from typing import Dict
+
+import pandas as pd
+from loguru import logger
+from pandas import DatetimeIndex, PeriodIndex, Series
+
 from app.model.ticker_data import TickerData
 from app.model.ticker_data_item import TickerDataItem
 from app.utils.utils import Utils
-from loguru import logger
-from pandas import DatetimeIndex, PeriodIndex, Series
-from typing import Dict
-import pandas as pd
 
 
 class BlueChipFilter:
 
     def __init__(
-        self,
-        sp_quality_ranking: str = 'A',
-        min_nr_of_shares: int = 5000000,
-        min_nr_of_institutional_investors: int = 80,
-        min_nr_of_uninterrupted_dividends: int = 25,
-        min_nr_of_dividend_increases: int = 5,
-        min_nr_of_earning_increases: int = 7,
+            self,
+            sp_quality_ranking: str = 'A',
+            min_nr_of_shares: int = 5000000,
+            min_nr_of_institutional_investors: int = 80,
+            min_nr_of_uninterrupted_dividends: int = 25,
+            min_nr_of_dividend_increases: int = 5,
+            min_nr_of_earning_increases: int = 7,
     ):
         self.sp_quality_ranking = sp_quality_ranking
         self.min_nr_of_shares = min_nr_of_shares
@@ -29,16 +31,15 @@ class BlueChipFilter:
         accepted_tickers: Dict[str, TickerDataItem] = dict()
         for symbol, ticker_data_item in ticker_data.symbol_to_ticker_response.items():
             try:
-                # Filter to exclude corrupt or incomplete tickers.
-                assert ticker_data_item.ticker.info['regularMarketOpen']
                 if self.is_applicable_symbol(ticker_data_item):
                     accepted_tickers[symbol] = ticker_data_item
-            except:
-                logger.warning(f"Could not evaluate symbol: {symbol}")
+            except Exception as e:
+                logger.warning(f"Could not evaluate symbol: {symbol} with error: {e}")
 
         return TickerData(accepted_tickers)
 
     def is_applicable_symbol(self, ticker_item: TickerDataItem) -> bool:
+        assert ticker_item.ticker.info['regularMarketOpen']
         return self.is_dividend_stock(ticker_item) and \
             self.has_sp_quality_ranking(ticker_item) and \
             self.has_minimum_nr_of_outstanding_shares(ticker_item) and \
@@ -71,7 +72,8 @@ class BlueChipFilter:
             nr_of_institutional_investors < self.min_nr_of_institutional_investors,
             float_held_by_institutional_investors < 0.5,
         ]):
-            logger.info(f"Filter symbol: {ticker_item.symbol} - Number of or float held by institutional investors to low: {nr_of_institutional_investors}.")
+            logger.info(
+                f"Filter symbol: {ticker_item.symbol} - Number of or float held by institutional investors to low: {nr_of_institutional_investors}.")
             return False
         return True
 
@@ -82,19 +84,20 @@ class BlueChipFilter:
             end=ticker_item.end_date,
             freq='Q',
             tz=ticker_item.ticker.history_metadata['exchangeTimezoneName'],
-        ).tz_convert(None).to_period('Q').drop_duplicates() # Only verify elapsed quarters!
-        quarters = quarters[quarters.year != 2020] # Exclude 2020 due to Covid pandemic!
+        ).tz_convert(None).to_period('Q').drop_duplicates()  # Only verify elapsed quarters!
+        quarters = quarters[quarters.year != 2020]  # Exclude 2020 due to Covid pandemic!
         missing_quarters = quarters.difference(dividend_dates.tz_convert(None).to_period('Q'))
         if not missing_quarters.empty:
-            logger.info(f"Filter symbol: {ticker_item.symbol} - Missing dividend quarters: {', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
+            logger.info(
+                f"Filter symbol: {ticker_item.symbol} - Missing dividend quarters: {', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
             return False
         return True
 
     def is_dividends_increasing_n_times(self, ticker_item: TickerDataItem) -> bool:
         dividends: Series = ticker_item.get_dividends()
         dividends_filtered = dividends.loc[
-            Utils.get_date_string_n_years_back(12, ticker_item.end_date):ticker_item.end_date
-        ]
+                             Utils.get_date_string_n_years_back(12, ticker_item.end_date):ticker_item.end_date
+                             ]
         dividend_increases = dividends_filtered.diff()[dividends_filtered.diff() > 0].dropna()
         dividend_decreases = dividends_filtered.diff()[dividends_filtered.diff() < 0].dropna()
         if any([dividend_increases.size < self.min_nr_of_dividend_increases, dividend_decreases.size > 0]):
