@@ -1,8 +1,9 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from loguru import logger
-from pathlib import Path
 
 from app.model.ticker_data import TickerData
 from app.utils.utils import Utils
@@ -11,7 +12,7 @@ from app.utils.utils import Utils
 class ValueProfile:
 
     @staticmethod
-    def visualize_profiles(blue_chips: TickerData, dst: Path) -> TickerData:
+    def visualize_profiles(blue_chips: TickerData, dst: Path):
         for symbol, ticker_data_item in blue_chips.symbol_to_ticker_response.items():
             logger.info(f'Creating the value profile for symbol: {symbol}')
             fig, axes = plt.subplots(3, 1, figsize=[13.333, 7.5])
@@ -33,8 +34,10 @@ class ValueProfile:
             annual_high_price_yields = ticker_data_item.annual_high_price_yields.reindex(index).interpolate().reindex(index)
             annual_low_price_yields = ticker_data_item.annual_low_price_yields.reindex(index).interpolate().reindex(index)
             annual_dividends = ticker_data_item.annual_dividends.reindex(index).fillna(method='ffill')
-            selected_high_price_yields = ticker_data_item.annual_high_price_yields[ticker_data_item.annual_high_price_yields < ticker_data_item.annual_high_price_yields.quantile(0.25)].dropna()
-            selected_low_price_yields = ticker_data_item.annual_low_price_yields[ticker_data_item.annual_low_price_yields > ticker_data_item.annual_low_price_yields.quantile(0.75)].dropna()
+            selected_high_price_yields = ticker_data_item.annual_high_price_yields[
+                ticker_data_item.annual_high_price_yields < ticker_data_item.annual_high_price_yields.quantile(0.25)].dropna()
+            selected_low_price_yields = ticker_data_item.annual_low_price_yields[
+                ticker_data_item.annual_low_price_yields > ticker_data_item.annual_low_price_yields.quantile(0.75)].dropna()
             overvalue_yield = 100 * ticker_data_item.overvalue_yield
             undervalue_yield = 100 * ticker_data_item.undervalue_yield
             overvalue_prices = ticker_data_item.overvalue_prices.reindex(index).fillna(method='ffill')
@@ -46,9 +49,11 @@ class ValueProfile:
             l4, = axes[1].plot(index, annual_dividends, color='k', lw=0.5, label='Annual Dividends')
             l5, = axes[2].plot(index, closing_prices, color='k', lw=0.5, label='Closing Prices')
             l6, = axes[3].plot(index, annual_high_price_yields, color='royalblue', zorder=1, label='Highest Price Yields')
-            l7 = axes[3].scatter(index, selected_high_price_yields.reindex(index), color='r', edgecolors='royalblue', zorder=2, label='Selected Highest Price Yields')
+            l7 = axes[3].scatter(index, selected_high_price_yields.reindex(index), color='r', edgecolors='royalblue', zorder=2,
+                                 label='Selected Highest Price Yields')
             l8, = axes[3].plot(index, annual_low_price_yields, color='orange', zorder=1, label='Lowest Price Yields')
-            l9 = axes[3].scatter(index, selected_low_price_yields.reindex(index), color='r', edgecolors='orange', zorder=2, label='Selected Lowest Price Yields')
+            l9 = axes[3].scatter(index, selected_low_price_yields.reindex(index), color='r', edgecolors='orange', zorder=2,
+                                 label='Selected Lowest Price Yields')
 
             for date, high_price_yield in selected_high_price_yields.iterrows():
                 axes[2].axvline(date, color='grey', lw=0.5)

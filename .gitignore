@@ -1,6 +1,5 @@
 # ignore folders/files
 .idea/
 log/*
-results/*.csv
-results/*.svg
+result
 venv

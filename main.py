@@ -39,7 +39,7 @@ def get_blue_chip_ticker_symbols() -> TickerData:
         )
 
 
-def get_value_profiles(blue_chips: TickerData) -> TickerData:
+def get_value_profiles(blue_chips: TickerData):
     root_path: Path = Path(__file__).resolve().parent
     ValueProfile.visualize_profiles(blue_chips, root_path.joinpath('result'))
 
