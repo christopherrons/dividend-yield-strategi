@@ -1,10 +1,7 @@
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Dict
 
 import pandas as pd
-import yfinance as yf
 from loguru import logger
 
 from app.model.ticker_data_item import TickerDataItem

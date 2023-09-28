@@ -1,8 +1,8 @@
-import csv
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+import csv
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta

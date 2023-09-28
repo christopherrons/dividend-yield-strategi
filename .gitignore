@@ -1,4 +1,6 @@
-# ignore (virtual) environment folders/files
+# ignore folders/files
 .idea/
+log/*
+results/*.csv
+results/*.svg
 venv
-log
