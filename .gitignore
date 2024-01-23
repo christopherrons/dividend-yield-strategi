@@ -1,5 +1,5 @@
 # ignore folders/files
 .idea/
 log/*
-result
+result/
 venv
