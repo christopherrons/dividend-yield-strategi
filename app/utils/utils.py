@@ -8,7 +8,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 from loguru import logger
 from pandas import DataFrame
-
+from requests.exceptions import HTTPError
 
 class Utils:
 
@@ -27,14 +27,30 @@ class Utils:
     @staticmethod
     def get_tickers(exchange: str):
         logger.info(f"Gathering ticker symbols for exchange: {exchange}")
-        api_key = 'JSEKU0PHS270VWS0'  # Free API key from https://www.alphavantage.co/support/#api-key (5 request per minute, 100 per day).
+        api_key = 'JSEKU0PHS270VWS0'  # Free API key from https://www.alphavantage.co/support/#api-key (5 request per minute, 100 per day). Herron
+        # api_key = 'XF5PSPU07UZA14WB'    # Free API key from https://www.alphavantage.co/support/#api-key (5 request per minute, 100 per day). VvZ
         url = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={api_key}'
         with requests.Session() as s:
-            download = s.get(url)
+            
+            try:
+                download = s.get(url)
+            except HTTPError as e:
+                if e.response.status_code == 429:  # Rate limit exceeded
+                    logger.warning(f"   -Rate limit exceeded - Error: {e}")
+
+            
+            
+            
             decoded_content = download.content.decode('utf-8')
             cr = list(csv.reader(decoded_content.splitlines(), delimiter=','))
             all_tickers = DataFrame(cr[1:], columns=cr[0])
-            return all_tickers[(all_tickers['exchange'] == exchange) & (all_tickers['assetType'] == 'Stock')]
+                   
+            if all_tickers.empty:
+                logger.warning(f"   - Server returned emtpy result")
+                result = None
+            else:
+                all_tickers[(all_tickers['exchange'] == exchange) & (all_tickers['assetType'] == 'Stock')]
+            return result
 
     @staticmethod
     def get_date_today() -> date:

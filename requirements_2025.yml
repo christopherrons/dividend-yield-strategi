@@ -1,0 +1,9 @@
+name: dividend-yield-strategy
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - loguru=0.7.2
+  - matplotlib=3.8.2
+  - scikit-learn=1.4.0=py311h142b183_0
+  - yfinance=0.2.51

@@ -78,11 +78,22 @@ class TickerDataItem:
 
     def get_nr_of_institutional_holders(self) -> int:
         major_holders: DataFrame = self.ticker.major_holders
-        return int(major_holders[major_holders[1] == "Number of Institutions Holding Shares"][0].values[0])
+        if len(major_holders) ==0:
+            result = 0
+        else:
+            result = int(major_holders.at['institutionsCount','Value'])
+            # result = int(major_holders[major_holders[1] == "Number of Institutions Holding Shares"][0].values[0]) # old line, for yfinance version 0.2.36
+        return result
 
     def get_float_held_by_institutional_investors(self) -> float:
         major_holders: DataFrame = self.ticker.major_holders
-        return 0.01 * float((major_holders[major_holders[1] == "% of Float Held by Institutions"][0].values[0]).strip('%'))
+        if len(major_holders) ==0:
+            result = 0
+        else:
+            result = float(major_holders.at['institutionsFloatPercentHeld','Value'])
+            # result = 0.01 * float((major_holders[major_holders[1] == "% of Float Held by Institutions"][0].values[0]).strip('%')) # old line, for yfinance version 0.2.36
+        
+        return result
 
     def get_basic_info(self) -> str:
         return f"Name: {self.ticker.info.get('longName')} - DY: {self.ticker.info.get('dividendYield')} - PEG: {self.ticker.info.get('pegRatio')} \

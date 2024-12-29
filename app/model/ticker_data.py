@@ -27,3 +27,5 @@ class TickerData:
         )
         if not df_tickers.empty:
             df_tickers.to_csv(dst, index=False)
+            print('df tickers stored at: ')
+            print(dst)

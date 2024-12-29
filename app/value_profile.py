@@ -14,10 +14,11 @@ class ValueProfile:
     @staticmethod
     def visualize_profiles(blue_chips: TickerData, dst: Path):
         for symbol, ticker_data_item in blue_chips.symbol_to_ticker_response.items():
+            name = ticker_data_item.name
             logger.info(f'Creating the value profile for symbol: {symbol}')
             fig, axes = plt.subplots(3, 1, figsize=[13.333, 7.5])
             fig.add_subplot(111, frameon=False)
-            fig.suptitle(f'Symbol: {symbol}', fontsize=10, fontweight='bold')
+            fig.suptitle(f'Symbol: {symbol}  ({name})', fontsize=10, fontweight='bold')
             plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
 
             axes[0].set_yscale('log')
