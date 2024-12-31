@@ -18,10 +18,17 @@ class YahooFinanceApiClient:
             symbol: YahooFinanceApiClient.create_ticker_data_item(symbol, ticker, symbols, start_date, end_date)
             for symbol, ticker in tickers.tickers.items()
         }
+        
+        print(start_date)
+        
         return TickerData(symbol_to_ticker_response)
 
     @staticmethod
     def create_ticker_data_item(symbol: str, ticker: Ticker, symbols: DataFrame, start_date: str, end_date: str) -> TickerDataItem:
+        
+        print(start_date)
+        
+        
         return TickerDataItem(
             symbol,
             list(symbols.loc[symbols['symbol'] == symbol, 'name'])[0],

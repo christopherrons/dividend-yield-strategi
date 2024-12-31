@@ -64,6 +64,11 @@ class TickerDataItem:
         return self.historical_ticker_data.undervalue_prices
 
     @property
+    def eps(self) -> DataFrame:
+        return self.ticker.income_stmt.loc['Diluted EPS']
+    
+
+    @property
     def annual_trend_using_weekly_prices(self) -> DataFrame:
         return self.historical_ticker_data.annual_trend_using_weekly_prices
 
@@ -99,3 +104,8 @@ class TickerDataItem:
         return f"Name: {self.ticker.info.get('longName')} - DY: {self.ticker.info.get('dividendYield')} - PEG: {self.ticker.info.get('pegRatio')} \
         - PB: {self.ticker.info.get('priceToBook')} - Sector: {self.ticker.info.get('sector')} - Industry: {self.ticker.info.get('industry')} \
         - Website: {self.ticker.info.get('website')}"
+        
+        
+    def get_all_info(self)->dict:
+        return self.ticker.get_info()
+        

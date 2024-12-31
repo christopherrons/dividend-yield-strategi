@@ -41,6 +41,8 @@ class BlueChipFilter:
             min_nr_of_uninterrupted_dividends: int = 25,
             min_nr_of_dividend_increases: int = 5,
             min_nr_of_earning_increases: int = 7,
+            allowed_missing_dividend_quarters:int = 4,
+            opt_check_dividend_decrease:bool = False,
             DEBUG:bool = True
     ):
         self.sp_quality_ranking = sp_quality_ranking
@@ -49,6 +51,8 @@ class BlueChipFilter:
         self.min_nr_of_uninterrupted_dividends = min_nr_of_uninterrupted_dividends
         self.min_nr_of_dividend_increases = min_nr_of_dividend_increases
         self.min_nr_of_earning_increases = min_nr_of_earning_increases
+        self.allowed_missing_dividend_quarters = allowed_missing_dividend_quarters
+        self.opt_check_dividend_decrease = opt_check_dividend_decrease
         self.DEBUG = DEBUG
 
     def run_filter(self, ticker_data: TickerData,n_sleep = 400, sleep_min =5 ) -> TickerData:
@@ -70,6 +74,7 @@ class BlueChipFilter:
                     if self.is_applicable_symbol(ticker_data_item):
                         accepted_tickers[symbol] = ticker_data_item
                         logger.info(f'   -{symbol} successfully passed the set filters')
+                        
                     break
                         
                 except HTTPError as e:
@@ -116,6 +121,7 @@ class BlueChipFilter:
             return False
         if self.DEBUG:
             logger.info(f"   -Filter symbol: {ticker_item.symbol} - Number of shares sufficient: {nr_of_shares}.")
+        ticker_item.nr_of_shares = nr_of_shares
         return True
 
     def has_minimum_nr_of_institutional_investors(self, ticker_item: TickerDataItem) -> bool:
@@ -131,6 +137,8 @@ class BlueChipFilter:
         if self.DEBUG:
             logger.info(
                 f"   -Filter symbol: {ticker_item.symbol} - Number of or float held by institutional investors sufficient: \nnr of major investors = {nr_of_institutional_investors}\nfloat held = {float_held_by_institutional_investors}")
+        ticker_item.nr_of_institutional_investors = nr_of_institutional_investors
+        
         return True
 
     def is_uninterrupted_dividends(self, ticker_item: TickerDataItem) -> bool:
@@ -146,13 +154,17 @@ class BlueChipFilter:
         
         if not missing_quarters.empty:
             n_missing_quarters = len(missing_quarters)
-            logger.info(
-                f"   -Filter symbol: {ticker_item.symbol} - Missing dividend quarters: n = {n_missing_quarters}\n{', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
-            return False
+            if n_missing_quarters >= self.allowed_missing_dividend_quarters:
+                logger.info(
+                    f"   -Filter symbol: {ticker_item.symbol} - Missing dividend quarters (Failed): n = {n_missing_quarters}\n{', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
+                return False
+            else:
+                logger.info(
+                    f"   -Filter symbol: {ticker_item.symbol} - Missing dividend quarters (Allowed): n = {n_missing_quarters}\n{', '.join([f'{i.year}Q{i.quarter}' for i in missing_quarters])}.")
+                return True
         if self.DEBUG:
             logger.info(
                 f"   -Filter symbol: {ticker_item.symbol} -  uninterruped dividends.")
-            
         return True
 
     def is_dividends_increasing_n_times(self, ticker_item: TickerDataItem) -> bool:
@@ -162,9 +174,17 @@ class BlueChipFilter:
                              ]
         dividend_increases = dividends_filtered.diff()[dividends_filtered.diff() > 0].dropna()
         dividend_decreases = dividends_filtered.diff()[dividends_filtered.diff() < 0].dropna()
-        if any([dividend_increases.size < self.min_nr_of_dividend_increases, dividend_decreases.size > 0]):
-            logger.info(f"   -Filter symbol: {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
-            return False
+        # if any([dividend_increases.size < self.min_nr_of_dividend_increases, dividend_decreases.size > 0]):
+        #     logger.info(f"   -Filter symbol: {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
+        #     return False
+        if dividend_increases.size < self.min_nr_of_dividend_increases:
+                logger.info(f"   -Filter symbol: {ticker_item.symbol} - Number of dividend increases is too low: {dividend_increases.size}.")
+                return False
+        if all([dividend_decreases.size > 0, self.opt_check_dividend_decrease]):
+                logger.info(f"   -Filter symbol: {ticker_item.symbol} - Number of dividend is decreased at least once: {dividend_decreases.size}.")
+                return False
+        
+        
         return True
 
     def is_earnings_increasing_n_times(self, ticker_item: TickerDataItem) -> bool:

@@ -130,6 +130,9 @@ class HistoricalTickerData:
 
     @property
     def undervalue_prices(self) -> DataFrame:
+        
+
+        
         if self._undervalue_prices is None:
             self._undervalue_prices = pd.DataFrame(
                 self.annual_dividends['Dividends'] / self.undervalue_yield,
